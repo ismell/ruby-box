@@ -34,10 +34,12 @@ module RubyBox
         # This is a workaround around:
         begin
           # were were given context information about this conflict?
-          file = RubyBox::File.new(@session, {
-            'id' => e['context_info']['conflicts'][0]['id']
-          })
-        rescue
+          # conflicts an either be an array or a hash
+          if (context_info = e['context_info']) && (conflicts = context_info['conflicts']) && (conflict = [conflicts].flatten(1).first) && (id = conflict['id'])
+            file = RubyBox::File.new(@session, {
+              'id' => id
+            })
+          else
           # we were not given context information about this conflict.
           # attempt to lookup the file.
           file = files(filename, 1000).pop
